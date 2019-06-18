@@ -72,4 +72,12 @@ object Ex4_9_3 extends App {
 
   println(read("12+3*").run(Nil).value)
 
+  val program = for {
+    _ <- read("12+")
+    _ <- read("34+")
+    ans <- readChar('*')
+  } yield ans
+
+  println(program.run(Nil).value)
+
 }
