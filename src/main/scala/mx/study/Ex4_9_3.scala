@@ -36,7 +36,9 @@ object Ex4_9_3 extends App {
 
   type Calculator[A] = State[List[Int], A]
 
-  def readOperand(v: Int): Calculator[Unit] = State.modify(s => v :: s)
+  def readOperand(v: Int): Calculator[Int] = State { s =>
+    (v::s, v)
+  }
 
   private def popOne: Calculator[Int] = State[List[Int], Int] { s =>
     (s.tail, s.head)
@@ -49,8 +51,6 @@ object Ex4_9_3 extends App {
     _ <- State.modify[List[Int]](r :: _)
   } yield r
 
-  def read(s: Char) = if (s.isDigit) readOperand(s.toInt) else readOperator(Operator.read(s))
-  
   val fs = for {
     _ <- readOperand(1)
     _ <- readOperand(2)
@@ -61,5 +61,15 @@ object Ex4_9_3 extends App {
 
   val r = fs.run(List())
   println(r.value)
+
+  def readChar(s: Char) = if (s.isDigit) readOperand(Character.getNumericValue(s)) else readOperator(Operator.read(s))
+
+  def read(s:String):Calculator[Int] = s.toCharArray.map(readChar).toList match {
+    case Nil => throw new IllegalArgumentException
+    case h :: Nil => h
+    case l => l.reduce((s1, s2) => s1.flatMap(_ => s2))
+  }
+
+  println(read("12+3*").run(Nil).value)
 
 }
