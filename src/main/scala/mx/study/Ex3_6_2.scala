@@ -1,7 +1,5 @@
 package mx.study
 
-import cats.Invariant
-
 object Ex3_6_2 extends App {
 
   trait Codec[A] {
@@ -43,17 +41,6 @@ object Ex3_6_2 extends App {
 
   println(Codec.encode(Box(34)))
   println(Codec.decode[Box[Int]]("34"))
-
-  import spray.json._
-
-  implicit def sprayContraVariant[A] = new Invariant[JsonFormat[A]] {
-    override def imap[A, B](fa: JsonFormat[A])(f: A => B)(g: B => A): JsonFormat[B] = new JsonFormat[B] {
-      override def write(obj: B): JsValue = fa.write(g(obj))
-
-      override def read(json: JsValue): B = f(fa.read(json))
-    }
-  }
-
 }
 
 
